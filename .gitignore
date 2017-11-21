@@ -1,0 +1,7 @@
+# Intellij
+*.iml
+.idea
+project/target/
+
+# sbt build
+target/

@@ -10,6 +10,10 @@ import spray.json._
 
 import scala.io.StdIn
 
+//TODO: Add db layer
+//TODO: Add tests
+//TODO: Add Dockerfile
+//FIXME: Clean up useless code
 // domain model
 final case class Item(name: String, id: Long)
 

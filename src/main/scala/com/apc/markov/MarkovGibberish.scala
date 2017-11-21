@@ -18,6 +18,7 @@ object MarkovGibberish {
         m + (k -> (values :+ v))
       }
 
+    //TODO: Think of multithreaded environment
     val n = Random.nextInt(aggregatedWords.keys.size - 2)
     var elements: Vector[String] = aggregatedWords(cleanWords(n))
     var randomElement: String = elements(Random.nextInt(elements.size))
@@ -29,6 +30,7 @@ object MarkovGibberish {
       gibberishWords = gibberishWords :+ randomElement
     }
 
+    //TODO: add random capitalization and punctuation
     gibberishWords.mkString(", ")
   }
 }

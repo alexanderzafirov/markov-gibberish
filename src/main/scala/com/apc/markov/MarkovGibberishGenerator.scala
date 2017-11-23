@@ -2,7 +2,7 @@ package com.apc.markov
 
 import scala.util.{Random, Try}
 
-object MarkovGibberish {
+object MarkovGibberishGenerator {
 
   def generate(input: String, size: Int): Try[String] = {
 

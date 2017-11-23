@@ -1,14 +1,18 @@
 package com.apc.rest
 
 import akka.actor.ActorSystem
+import akka.dispatch.sysmsg.Create
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport
+import akka.http.scaladsl.model.{HttpResponse, StatusCodes}
 import akka.http.scaladsl.server.Directives
 import akka.stream.ActorMaterializer
 import com.apc.markov.MarkovGibberish
 import spray.json._
 
+import scala.concurrent.Future
 import scala.io.StdIn
+import scala.util.{Failure, Success}
 
 //TODO: Add db layer
 //TODO: Add tests
@@ -37,12 +41,21 @@ object RestServer extends App with Directives with JsonSupport {
   val route =
     path("gibberish") {
       get {
-        complete(Item("thing", 42)) // will render as JSON
+        complete(Item("thing", 42))
       } ~
         post {
           parameter('length.as[Int]) { length =>
-            entity(as[String]) { input => // will unmarshal JSON to Order
-              complete(MarkovGibberish.generator(input, length))
+            entity(as[String]) { input =>
+              val eventualGibberish = Future(MarkovGibberish.generate(input, length))
+              onComplete(eventualGibberish) {
+                case Success(Failure(_)) | Failure(_) => complete(
+                  HttpResponse(
+                    StatusCodes.InternalServerError,
+                    entity = "Couldn't generate gebberish for the given input/size. Try different input/size."
+                  )
+                )
+                case Success(Success(v)) => complete(HttpResponse(StatusCodes.Created, entity = v))
+              }
             }
           }
         }

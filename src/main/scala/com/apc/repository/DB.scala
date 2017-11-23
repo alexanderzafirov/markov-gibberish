@@ -24,7 +24,7 @@ trait Connection {
 
 trait CreateTables {
 
-  implicit val session = AutoSession
+  implicit val session: AutoSession.type = AutoSession
 
   sql"""
 create table gibberish (

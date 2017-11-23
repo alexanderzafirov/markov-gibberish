@@ -10,7 +10,7 @@ import com.apc.markov.MarkovGibberishGenerator
 import com.apc.repository.DB
 import org.joda.time.DateTime
 
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContextExecutor, Future}
 import scala.io.StdIn
 import scala.util.{Failure, Success}
 
@@ -18,9 +18,9 @@ import scala.util.{Failure, Success}
 //TODO: Add Dockerfile
 object RestServer extends App with Directives {
 
-  implicit val system = ActorSystem("my-system")
-  implicit val materializer = ActorMaterializer()
-  implicit val executionContext = system.dispatcher
+  implicit val system: ActorSystem = ActorSystem("my-system")
+  implicit val materializer: ActorMaterializer = ActorMaterializer()
+  implicit val executionContext: ExecutionContextExecutor = system.dispatcher
 
   val typeSafeConfig = system.settings.config
 

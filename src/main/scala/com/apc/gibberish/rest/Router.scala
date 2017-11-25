@@ -2,11 +2,11 @@ package com.apc.gibberish.rest
 
 import akka.http.scaladsl.model.headers.Location
 import akka.http.scaladsl.model.{HttpResponse, StatusCodes}
+import akka.http.scaladsl.server.{Directives, Route}
 import com.apc.gibberish.markov.MarkovGibberishGenerator
+import com.apc.gibberish.model.JsonSupport
 import com.apc.gibberish.repository.Repository
 import org.joda.time.DateTime
-import akka.http.scaladsl.server.{Directives, Route}
-import com.apc.gibberish.model.JsonSupport
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -23,47 +23,46 @@ trait Router extends Directives with JsonSupport {
         }
       }
     } ~
-      path("gibberish") {
+      path("gibberish" / IntNumber) { id =>
         get {
-          parameter('id.as[Long]) { id =>
-            onComplete(Repository.findGiberrishById(id)) {
-              case Failure(_) => complete(StatusCodes.InternalServerError)
-              case Success(None) => complete(StatusCodes.NotFound)
-              case Success(g) => complete(g)
-            }
+          onComplete(Repository.findGiberrishById(id)) {
+            case Failure(_) => complete(StatusCodes.InternalServerError)
+            case Success(None) => complete(StatusCodes.NotFound)
+            case Success(g) => complete(g)
           }
-        } ~
-          post {
-            parameter('length.as[Int]) { length =>
-              entity(as[String]) { input =>
-                val eventualGibberish = Future(MarkovGibberishGenerator.generate(input, length))
-                onComplete(eventualGibberish) {
-                  case Success(Failure(_)) | Failure(_) => complete(
+        }
+      } ~
+      post {
+        parameter('length.as[Int]) { length =>
+          entity(as[String]) { input =>
+            val eventualGibberish = Future(MarkovGibberishGenerator.generate(input, length))
+            onComplete(eventualGibberish) {
+              case Success(Failure(_)) | Failure(_) => complete(
+                HttpResponse(
+                  StatusCodes.InternalServerError,
+                  entity = "Couldn't generate gibberish for the given input/size. Try different input/length."
+                )
+              )
+              case Success(Success(text)) =>
+                onComplete(Repository.insertGibberish(text, DateTime.now)) {
+                  case Failure(_) => complete(
                     HttpResponse(
                       StatusCodes.InternalServerError,
-                      entity = "Couldn't generate gibberish for the given input/size. Try different input/length."
+                      entity = "Requested input is too large to store. Please select a smaller input length."
                     )
                   )
-                  case Success(Success(text)) =>
-                    onComplete(Repository.insertGibberish(text, DateTime.now)) {
-                      case Failure(_) => complete(
-                        HttpResponse(
-                          StatusCodes.InternalServerError,
-                          entity = "Requested input is too large to store. Please select a smaller input length."
-                        )
-                      )
-                      case Success(l) =>
-                        extractRequestContext { requestContext =>
-                          val request = requestContext.request
-                          val location = request.uri.copy(path = request.uri.path / l.toString)
-                          respondWithHeader(Location(location)) {
-                            complete(HttpResponse(StatusCodes.Created, entity = text))
-                          }
-                        }
+                  case Success(l) =>
+                    extractRequestContext { requestContext =>
+                      val request = requestContext.request
+                      val location = request.uri.copy(path = request.uri.path / l.toString, rawQueryString = None)
+                      respondWithHeader(Location(location)) {
+                        complete(HttpResponse(StatusCodes.Created, entity = text))
+                      }
                     }
                 }
-              }
             }
           }
+        }
       }
+
 }

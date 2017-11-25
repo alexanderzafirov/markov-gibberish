@@ -20,7 +20,7 @@ class RestServerTest extends GibberishSpec with ScalatestRouteTest with Router {
     }
 
     "return 404 for GET request to /gibberish with id that doesn't exist" in {
-      Get("/gibberish?id=0") ~> route ~> check {
+      Get("/gibberish/0") ~> route ~> check {
         status shouldEqual StatusCodes.NotFound
       }
     }
@@ -35,7 +35,7 @@ class RestServerTest extends GibberishSpec with ScalatestRouteTest with Router {
 
     "return a Gibberish object with the given id containing the corresponding entry for GET request to /gibberish" in {
       Await.result(Repository.insertGibberish("apc", now), Duration.Inf)
-      Get("/gibberish?id=1") ~> route ~> check {
+      Get("/gibberish/1") ~> route ~> check {
         responseAs[Gibberish] shouldEqual Gibberish(1L, "apc", now)
       }
     }
@@ -46,7 +46,7 @@ class RestServerTest extends GibberishSpec with ScalatestRouteTest with Router {
       }
     }
 
-    "return a MethodNotAllowed error for PUT requests to the root path" in {
+    "return a 201 when posting gibberish successfully" in {
       Post("/gibberish?length=3", "apc apc com ftw ftw, lol lol yes no yes") ~> route ~> check {
         status shouldEqual StatusCodes.Created
       }

@@ -22,7 +22,7 @@ The heart of the application is the `MarkovGibberishGenerator`. The algorithm th
 Alice same she shore and seemed to remark myself, as she went back to the heard at Alice hastily, after open her sister. Here, Bill! The Duchess too late it a bit had a sort of they are the Queen. An invitation a little of the ran what it was only down her to the other; the Dodo, a Lory and the please that it must as well very good making a dish of time," she added, "It isn’t a letters".
  
 ### Project structure
-- The `RestServer` class is the starting point for the whole application. It holds implicits that are necessary for the operation of akka streams and reads configuraitons from the `application.conf`
+- The `RestServer` class is the starting point for the whole application. It holds implicits that are necessary for the operation of Akka HTTP and reads configurations from the `application.conf`
 - The `Router` hosts the REST API paths that are exposed to clients
 - The model used for persistence and de/serialization is hosted under `Gibberish`
 - `Repository` is taking care of the interaction between the REST client and the in-memory db
@@ -30,7 +30,7 @@ Alice same she shore and seemed to remark myself, as she went back to the heard 
 - Tests are located under the `test.scala` package
 
 ### Known limitations
-It could happen that the algorithm ends up in a state from which there is no way out i.e. there is the word that is selected only appears as a value in the map but not as a key. That leads to an error whenever that word is used as key lookup in the word-to-word map. For simplicity this not is resolved rather simply communicated to the user through a proper response code and error message.
+It could happen that the algorithm ends up in a state from which there is no way out i.e. there is the word that is selected only appears as a value in the map but not as key. That leads to an error whenever that word is used as key lookup in the word-to-word map. For simplicity this not is resolved rather communicated to the user through a proper response code and error message.
 To mitigate this scenario two strategies are to be followed:
 - provide richer input texts - with more words and/or with repetitive words
 - provide shorter `length` parameter - which unfortunately results in simpler and uninteresting output
@@ -85,6 +85,7 @@ To mitigate this scenario two strategies are to be followed:
 Internal Server Error
 ```
 
+
 **Retrieve a particular gibberish by id**
 
 * URL
@@ -94,10 +95,6 @@ Internal Server Error
 * Method
 
     GET
-
-* Request Params
-
-    - gibberish_id - id of the gibberish entry
 
 * Success Response - Json containing the gibberish:
     - Code - 200
@@ -125,6 +122,7 @@ Internal Server Error
 ```
 The requested resource could not be found but may be available again in the future.
 ```
+
 
 **Submit text for gibberishization**
 

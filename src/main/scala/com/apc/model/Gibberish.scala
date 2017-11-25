@@ -4,7 +4,7 @@ import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport
 import org.joda.time.DateTime
 import org.joda.time.format.{DateTimeFormatter, ISODateTimeFormat}
 import scalikejdbc._
-import skinny.orm.SkinnyCRUDMapper
+import skinny.orm.{Alias, SkinnyCRUDMapper}
 import spray.json.{DefaultJsonProtocol, JsString, JsValue, RootJsonFormat}
 
 final case class Gibberish(id: Long, text: String, createdAt: DateTime)
@@ -13,7 +13,7 @@ final case class Gibberishes(items: List[Gibberish])
 
 object Gibberish extends SkinnyCRUDMapper[Gibberish] {
 
-  override lazy val defaultAlias = createAlias("g")
+  override lazy val defaultAlias: Alias[Gibberish] = createAlias("g")
 
   override def extract(rs: WrappedResultSet, g: ResultName[Gibberish]): Gibberish = new Gibberish(
     id = rs.get(g.id),

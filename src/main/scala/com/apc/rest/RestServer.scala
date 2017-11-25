@@ -61,7 +61,7 @@ object RestServer extends App with Directives with JsonSupport {
                           entity = "Requested input is too large to store. Please select a smaller input size."
                         )
                       )
-                      case Success(g) => complete(HttpResponse(StatusCodes.Created, entity = text))
+                      case Success(_) => complete(HttpResponse(StatusCodes.Created, entity = text))
                     }
                 }
               }

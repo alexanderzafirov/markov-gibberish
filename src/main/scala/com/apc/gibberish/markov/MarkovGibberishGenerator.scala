@@ -1,4 +1,4 @@
-package com.apc.markov
+package com.apc.gibberish.markov
 
 import scala.util.{Random, Try}
 

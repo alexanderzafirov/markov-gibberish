@@ -1,6 +1,6 @@
-package com.apc.repository
+package com.apc.gibberish.repository
 
-import com.apc.model.{Gibberish, Gibberishes}
+import com.apc.gibberish.model.{Gibberish, Gibberishes}
 import org.joda.time.DateTime
 import scalikejdbc.{ConnectionPool, _}
 

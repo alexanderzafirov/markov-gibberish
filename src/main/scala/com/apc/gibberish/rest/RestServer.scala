@@ -1,4 +1,4 @@
-package com.apc.rest
+package com.apc.gibberish.rest
 
 import akka.actor.ActorSystem
 import akka.http.scaladsl.Http

@@ -1,11 +1,11 @@
-package com.apc.rest
+package com.apc.gibberish.rest
 
 import akka.http.scaladsl.model.{HttpResponse, StatusCodes}
-import com.apc.markov.MarkovGibberishGenerator
-import com.apc.repository.Repository
+import com.apc.gibberish.markov.MarkovGibberishGenerator
+import com.apc.gibberish.repository.Repository
 import org.joda.time.DateTime
 import akka.http.scaladsl.server.{Directives, Route}
-import com.apc.model.JsonSupport
+import com.apc.gibberish.model.JsonSupport
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import scala.util.{Failure, Success}

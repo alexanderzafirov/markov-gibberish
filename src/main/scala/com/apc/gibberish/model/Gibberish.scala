@@ -1,4 +1,4 @@
-package com.apc.model
+package com.apc.gibberish.model
 
 import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport
 import org.joda.time.DateTime

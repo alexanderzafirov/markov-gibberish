@@ -1,19 +1,15 @@
-package rest
+package com.apc.gibberish.rest
 
 import akka.http.scaladsl.model.StatusCodes
 import akka.http.scaladsl.testkit.ScalatestRouteTest
-import com.apc.model.{Gibberish, Gibberishes}
-import com.apc.repository.Repository
-import com.apc.rest.Router
-import org.joda.time.DateTime
-import org.scalatest.{Matchers, WordSpec}
+import com.apc.gibberish.GibberishSpec
+import com.apc.gibberish.model.{Gibberish, Gibberishes}
+import com.apc.gibberish.repository.Repository
 
 import scala.concurrent.Await
 import scala.concurrent.duration.Duration
 
-class RestServerTest extends WordSpec with Matchers with ScalatestRouteTest with Router {
-
-  val now: DateTime = DateTime.parse("2017-11-25T14:17:36")
+class RestServerTest extends GibberishSpec with ScalatestRouteTest with Router {
 
   "The service" should {
 

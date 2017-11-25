@@ -29,7 +29,7 @@ trait CreateTables {
   sql"""
 create table gibberish (
   id bigint auto_increment primary key not null,
-  text varchar(100) not null,
+  text varchar(1000) not null,
   created_at timestamp not null
 )
     """.execute.apply()

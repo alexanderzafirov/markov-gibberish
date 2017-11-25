@@ -2,11 +2,11 @@ package com.apc.rest
 
 import akka.actor.ActorSystem
 import akka.http.scaladsl.Http
-import akka.http.scaladsl.marshalling.ToResponseMarshallable
 import akka.http.scaladsl.model.{HttpResponse, StatusCodes}
 import akka.http.scaladsl.server.Directives
 import akka.stream.ActorMaterializer
 import com.apc.markov.MarkovGibberishGenerator
+import com.apc.model.JsonSupport
 import com.apc.repository.DB
 import org.joda.time.DateTime
 
@@ -16,7 +16,7 @@ import scala.util.{Failure, Success}
 
 //TODO: Add tests
 //TODO: Add Dockerfile
-object RestServer extends App with Directives {
+object RestServer extends App with Directives with JsonSupport {
 
   implicit val system: ActorSystem = ActorSystem("my-system")
   implicit val materializer: ActorMaterializer = ActorMaterializer()
@@ -27,17 +27,19 @@ object RestServer extends App with Directives {
   val route =
     path("gibberishes") {
       get {
-        complete(
-          DB.retrieveAllGiberrish().mapTo[ToResponseMarshallable]
-        )
+        onComplete(DB.retrieveAllGiberrish()) {
+          case Failure(_) => complete(HttpResponse(StatusCodes.InternalServerError))
+          case Success(g) => complete(g)
+        }
       }
     } ~
       path("gibberish") {
         get {
           parameter('id.as[Long]) { id =>
-            complete(
-              DB.findGiberrishById(id).mapTo[ToResponseMarshallable]
-            )
+            onComplete(DB.findGiberrishById(id)) {
+              case Failure(_) => complete(HttpResponse(StatusCodes.InternalServerError))
+              case Success(g) => complete(g)
+            }
           }
         } ~
           post {
@@ -48,11 +50,19 @@ object RestServer extends App with Directives {
                   case Success(Failure(_)) | Failure(_) => complete(
                     HttpResponse(
                       StatusCodes.InternalServerError,
-                      entity = "Couldn't generate gebberish for the given input/size. Try different input/size."
+                      entity = "Couldn't generate gibberish for the given input/size. Try different input/size."
                     )
                   )
                   case Success(Success(text)) =>
-                    onComplete(DB.createGibberish(text, DateTime.now))(_ => complete(HttpResponse(StatusCodes.Created, entity = text)))
+                    onComplete(DB.createGibberish(text, DateTime.now)) {
+                      case Failure(_) => complete(
+                        HttpResponse(
+                          StatusCodes.InternalServerError,
+                          entity = "Requested input is too large to store. Please select a smaller input size."
+                        )
+                      )
+                      case Success(g) => complete(HttpResponse(StatusCodes.Created, entity = text))
+                    }
                 }
               }
             }

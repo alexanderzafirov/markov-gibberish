@@ -14,8 +14,10 @@ val akkaHttpDeps = Seq(
 libraryDependencies ++= akkaHttpDeps
 
 val skinnyDeps = Seq(
-  "org.skinny-framework" %% "skinny-orm"      % "2.5.2",
-  "com.h2database"       %  "h2"              % "1.4.+",
-  "ch.qos.logback"       %  "logback-classic" % "1.1.+"
+  "org.skinny-framework" %% "skinny-orm" % "2.5.2",
+  "com.h2database" % "h2" % "1.4.+",
+  "ch.qos.logback" % "logback-classic" % "1.1.+"
 )
 libraryDependencies ++= skinnyDeps
+
+libraryDependencies += "org.scalatest" % "scalatest_2.12" % "3.0.4" % "test"

@@ -7,13 +7,15 @@ import scalikejdbc.{ConnectionPool, _}
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-object DB extends Connection with CreateTables {
+object Repository extends GibberishCalls with Connection with CreateTables
+
+trait GibberishCalls {
 
   def retrieveAllGiberrish() = Future(Gibberishes(Gibberish.findAll()))
 
   def findGiberrishById(id: Long) = Future(Gibberish.findById(id))
 
-  def createGibberish(text: String, d: DateTime): Future[Long] =
+  def insertGibberish(text: String, d: DateTime): Future[Long] =
     Future(Gibberish.createWithAttributes('text -> text, 'createdAt -> d))
 }
 

@@ -7,7 +7,6 @@ import akka.stream.ActorMaterializer
 import scala.concurrent.ExecutionContextExecutor
 import scala.io.StdIn
 
-//TODO: Add Dockerfile
 object RestServer extends App with Router {
 
   implicit val system: ActorSystem = ActorSystem("my-system")

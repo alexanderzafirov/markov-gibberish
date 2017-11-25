@@ -1,11 +1,13 @@
 package com.apc.gibberish.rest
 
+import akka.http.scaladsl.model.headers.Location
 import akka.http.scaladsl.model.{HttpResponse, StatusCodes}
 import com.apc.gibberish.markov.MarkovGibberishGenerator
 import com.apc.gibberish.repository.Repository
 import org.joda.time.DateTime
 import akka.http.scaladsl.server.{Directives, Route}
 import com.apc.gibberish.model.JsonSupport
+
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import scala.util.{Failure, Success}
@@ -50,7 +52,14 @@ trait Router extends Directives with JsonSupport {
                           entity = "Requested input is too large to store. Please select a smaller input length."
                         )
                       )
-                      case Success(_) => complete(HttpResponse(StatusCodes.Created, entity = text))
+                      case Success(l) =>
+                        extractRequestContext { requestContext =>
+                          val request = requestContext.request
+                          val location = request.uri.copy(path = request.uri.path / l.toString)
+                          respondWithHeader(Location(location)) {
+                            complete(HttpResponse(StatusCodes.Created, entity = text))
+                          }
+                        }
                     }
                 }
               }

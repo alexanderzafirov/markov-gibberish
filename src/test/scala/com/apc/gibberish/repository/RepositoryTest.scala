@@ -5,8 +5,6 @@ import com.apc.gibberish.model.Gibberish
 
 class RepositoryTest extends GibberishSpec with Connection with CreateTable with GibberishCalls {
 
-  override def afterAll(): Unit = dropTable()
-
   "The service" should {
 
     "retrieve no gibberish when there is none" in {

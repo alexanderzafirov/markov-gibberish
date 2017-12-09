@@ -14,7 +14,7 @@ class MarkovGibberishGeneratorTest extends FlatSpec {
     assert(MarkovGibberishGenerator.aggregatedWords(Array("this", "banana", "this", "crazy")) == Map("this" -> Vector("banana", "crazy"), "banana" -> Vector("this")))
   }
 
-  "doMarkovRun" should "" in {
+  "doMarkovRun" should "do a markov run on a given map with a specified seed" in {
     assert(MarkovGibberishGenerator.doMarkovRun(Map("this" -> Vector("banana"), "banana" -> Vector("this"), "that" -> Vector("banana", "this")), 2, new Random(1123)).get == "banana this banana this")
   }
 }

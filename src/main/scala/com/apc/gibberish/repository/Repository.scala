@@ -1,25 +1,19 @@
 package com.apc.gibberish.repository
 
-import akka.dispatch.MessageDispatcher
-import com.apc.gibberish._
 import com.apc.gibberish.model.{Gibberish, Gibberishes}
 import org.joda.time.DateTime
 import scalikejdbc.{ConnectionPool, _}
 
-import scala.concurrent.Future
-
-object Repository extends GibberishCalls with Connection with CreateTables
+object Repository extends GibberishCalls with Connection with CreateTable
 
 trait GibberishCalls {
 
-  implicit val blockingDispatcher: MessageDispatcher = system.dispatchers.lookup("my-blocking-dispatcher")
+  def retrieveAllGiberrish(): Gibberishes = Gibberishes(Gibberish.findAll())
 
-  def retrieveAllGiberrish() = Future(Gibberishes(Gibberish.findAll()))
+  def findGiberrishById(id: Long): Option[Gibberish] = Gibberish.findById(id)
 
-  def findGiberrishById(id: Long) = Future(Gibberish.findById(id))
-
-  def insertGibberish(text: String, d: DateTime): Future[Long] =
-    Future(Gibberish.createWithAttributes('text -> text, 'createdAt -> d))
+  def insertGibberish(text: String, d: DateTime): Long =
+    Gibberish.createWithAttributes('text -> text, 'createdAt -> d)
 }
 
 trait Connection {
@@ -27,15 +21,20 @@ trait Connection {
   ConnectionPool.singleton("jdbc:h2:mem:skinny-mapper-test", "sa", "sa")
 }
 
-trait CreateTables {
+trait CreateTable {
 
   implicit val session: AutoSession.type = AutoSession
 
   sql"""
-create table gibberish (
-  id bigint auto_increment primary key not null,
-  text varchar(1000) not null,
-  created_at timestamp not null
-)
+    create table gibberish (
+      id bigint auto_increment primary key not null,
+      text varchar(1000) not null,
+      created_at timestamp not null
+    )
+    """.execute.apply()
+
+  def dropTable(): Boolean =
+    sql"""
+      drop table gibberish
     """.execute.apply()
 }

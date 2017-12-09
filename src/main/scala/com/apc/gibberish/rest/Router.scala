@@ -1,5 +1,6 @@
 package com.apc.gibberish.rest
 
+import akka.dispatch.MessageDispatcher
 import akka.http.scaladsl.model.headers.Location
 import akka.http.scaladsl.model.{HttpResponse, StatusCodes}
 import akka.http.scaladsl.server.{Directives, Route}
@@ -14,11 +15,12 @@ import scala.util.{Failure, Success}
 
 trait Router extends Directives with JsonSupport {
 
+  implicit val blockingDispatcher: MessageDispatcher = system.dispatchers.lookup("my-blocking-dispatcher")
 
   val route: Route =
     path("gibberishes") {
       get {
-        onComplete(Repository.retrieveAllGiberrish()) {
+        onComplete(Future(Repository.retrieveAllGiberrish())) {
           case Failure(_) => complete(StatusCodes.InternalServerError)
           case Success(g) => complete(g)
         }
@@ -26,7 +28,7 @@ trait Router extends Directives with JsonSupport {
     } ~
       path("gibberish" / IntNumber) { id =>
         get {
-          onComplete(Repository.findGiberrishById(id)) {
+          onComplete(Future(Repository.findGiberrishById(id))) {
             case Failure(_) => complete(StatusCodes.InternalServerError)
             case Success(None) => complete(StatusCodes.NotFound)
             case Success(g) => complete(g)
@@ -45,7 +47,7 @@ trait Router extends Directives with JsonSupport {
                 )
               )
               case Success(Success(text)) =>
-                onComplete(Repository.insertGibberish(text, DateTime.now)) {
+                onComplete(Future(Repository.insertGibberish(text, DateTime.now))) {
                   case Failure(_) => complete(
                     HttpResponse(
                       StatusCodes.InternalServerError,

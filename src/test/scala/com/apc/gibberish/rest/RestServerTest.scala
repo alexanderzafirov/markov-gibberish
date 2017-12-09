@@ -6,9 +6,6 @@ import com.apc.gibberish.GibberishSpec
 import com.apc.gibberish.model.{Gibberish, Gibberishes}
 import com.apc.gibberish.repository.Repository
 
-import scala.concurrent.Await
-import scala.concurrent.duration.Duration
-
 class RestServerTest extends GibberishSpec with ScalatestRouteTest with Router {
 
   "The service" should {
@@ -26,15 +23,15 @@ class RestServerTest extends GibberishSpec with ScalatestRouteTest with Router {
     }
 
     "return a Gibberishes object containing all previously inserted gibberish entries for GET request to /gibberishes" in {
-      Await.result(Repository.insertGibberish("apc", now), Duration.Inf)
-      Await.result(Repository.insertGibberish("ftw", now), Duration.Inf)
+      Repository.insertGibberish("apc", now)
+      Repository.insertGibberish("ftw", now)
       Get("/gibberishes") ~> route ~> check {
         responseAs[Gibberishes] shouldEqual Gibberishes(List(Gibberish(1L, "apc", now), Gibberish(2, "ftw", now)))
       }
     }
 
     "return a Gibberish object with the given id containing the corresponding entry for GET request to /gibberish" in {
-      Await.result(Repository.insertGibberish("apc", now), Duration.Inf)
+      Repository.insertGibberish("apc", now)
       Get("/gibberish/1") ~> route ~> check {
         responseAs[Gibberish] shouldEqual Gibberish(1L, "apc", now)
       }

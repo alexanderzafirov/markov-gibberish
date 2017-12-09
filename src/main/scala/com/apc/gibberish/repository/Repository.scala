@@ -1,15 +1,18 @@
 package com.apc.gibberish.repository
 
+import akka.dispatch.MessageDispatcher
+import com.apc.gibberish._
 import com.apc.gibberish.model.{Gibberish, Gibberishes}
 import org.joda.time.DateTime
 import scalikejdbc.{ConnectionPool, _}
 
-import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 object Repository extends GibberishCalls with Connection with CreateTables
 
 trait GibberishCalls {
+
+  implicit val blockingDispatcher: MessageDispatcher = system.dispatchers.lookup("my-blocking-dispatcher")
 
   def retrieveAllGiberrish() = Future(Gibberishes(Gibberish.findAll()))
 

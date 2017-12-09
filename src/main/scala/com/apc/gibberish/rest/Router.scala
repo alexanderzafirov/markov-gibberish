@@ -3,16 +3,17 @@ package com.apc.gibberish.rest
 import akka.http.scaladsl.model.headers.Location
 import akka.http.scaladsl.model.{HttpResponse, StatusCodes}
 import akka.http.scaladsl.server.{Directives, Route}
+import com.apc.gibberish._
 import com.apc.gibberish.markov.MarkovGibberishGenerator
 import com.apc.gibberish.model.JsonSupport
 import com.apc.gibberish.repository.Repository
 import org.joda.time.DateTime
 
-import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import scala.util.{Failure, Success}
 
 trait Router extends Directives with JsonSupport {
+
 
   val route: Route =
     path("gibberishes") {
